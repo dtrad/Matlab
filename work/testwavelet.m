@@ -1,0 +1,10 @@
+dt=0.004;NF=512;
+trace=zeros(NF,1);trace(100)=0.5;
+wav=rickerm(50,dt);
+subplot(211);plot(wav);wav=padzeros(wav,NF);
+fwav=fft(wav);;fwav=fwav(:);
+%fwav=convlim(fwav,trace,NF);
+fwav_shift=fwav.*exp(-i*w*dt*100);
+wavr=ifft(fwav_shift);
+subplot(212);plot(real(wavr));
+figure(gcf)

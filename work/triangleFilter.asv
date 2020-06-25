@@ -1,0 +1,18 @@
+function [z]=triangleFilter(nb,nx,x)
+% implementation of boxcar twice using recursive filter.
+% 
+b=zeros(1,nx+nb);
+b(1:nx)=integrate2(x);
+%b(1:nx)=cumsum(x(1:nx));
+nh=(nb-1)/2;
+y=zeros(1,nx+nb);
+for (i=nb+1:nx)
+ y(i+nh+) = b(i+nb) - b(i-nb);
+end
+
+y=y/nb*2;
+y=y-mean(y);
+
+z(1:nx)=y(1:nx);
+return;
+

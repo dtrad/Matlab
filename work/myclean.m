@@ -1,0 +1,2 @@
+function myclean
+close all;

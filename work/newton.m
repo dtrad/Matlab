@@ -1,0 +1,64 @@
+function [y,ysteps]=newton(d1fx,d2fx,x0,tol,itermax);
+%input: 
+%	
+% d1fx : first derivative function  (function for finding roots)
+% d2fx : second derivative function (first derivative for finding roots)
+% x0 : starting point
+% tol: tolerance 
+% itermax: maximum iterations
+%
+% output:
+%  y : x cordinate for extreme point of f(x)
+%  ysteps :  vector with the history for x as a function of the
+%  number of iterations
+%
+% The same routines can be used to find the minimum or maximum and zeros
+% When the zero is required the input arguments are the function
+% and  the first derivative.
+% When the extremum is required the input arguments are the first
+% and 
+% second derivative. 
+%
+% Daniel Trad -- EOSC555 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+iter=1;
+error=0;
+y=x0;
+ysteps(iter)=y;
+
+
+while( (error>tol | iter==1) & iter < itermax)
+  
+    d1fy=feval(d1fx,y);
+    d2fy=feval(d2fx,y);
+
+%   Loop to move away of x when the second derivative is zero 
+%   Hopefully it never goes into this
+%   eps is the small number defined in matlab. The factor 100 I
+%   used is empprical and it could be defined 
+%   as an argument instead to speed up computations. 
+    while (abs(d2fy) < eps & abs(d1fy) > tol) 
+      if (d1fy > 0 )
+	y=y-100*eps
+      else 
+	y=y+100*eps
+      end	
+      d1fy=feval(d1fx,y);
+      d2fy=feval(d2fx,y);
+    end  
+      
+%   yn=y-d1fy/d2fy;
+%   Change to find always a minimum
+    yn=y-d1fy/abs(d2fy);
+    error=abs(feval(d1fx,yn));
+    iter=iter+1;
+    ysteps(iter)=yn;
+
+    y=yn;
+      
+  
+
+end
+
+
+

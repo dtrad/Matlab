@@ -1,0 +1,15 @@
+% plot figures
+figure(1);print -djpeg figure1.jpeg
+figure(2);print -djpeg figure2.jpeg
+figure(3);print -djpeg figure3.jpeg
+figure(4);print -djpeg figure4.jpeg
+figure(5);print -djpeg figure5.jpeg
+figure(6);print -djpeg figure6.jpeg
+figure(7);print -djpeg figure7.jpeg
+figure(8);print -djpeg figure8.jpeg
+figure(9);print -djpeg figure9.jpeg
+figure(10);print -djpeg figure10.jpeg
+figure(11);print -djpeg figure11.jpeg
+figure(12);print -djpeg figure12.jpeg
+figure(13);print -djpeg figure13.jpeg
+figure(14);print -djpeg figure14.jpeg

@@ -1,0 +1,15 @@
+function [y]=boxcarRec2(nb,nx,x)
+% implementation of boxcar using recursive filter.
+% actually it should integrate twice,
+% not sure how to do that in time.
+b=zeros(1,nx+nb);
+b(1:nx)=cumsum(x(1:nx));
+bb=cumsum(b(nb:-1:1));
+nh=(nb-1)/2;
+
+for (i=nh+1:nx)
+ y(i) = bb(i+nh) - bb(i-nh);
+end
+
+y=y/nb*2;
+return;

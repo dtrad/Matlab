@@ -1,0 +1,9 @@
+function [x]=integrate2fft(x)
+n=length(x);
+m=2;
+while ( m <
+dt=0.004;
+freqaxisCalc(dt,n);
+X=fft(x);
+for (i=1:n)
+    
