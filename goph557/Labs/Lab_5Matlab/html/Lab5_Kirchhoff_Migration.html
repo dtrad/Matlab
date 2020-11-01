@@ -1,0 +1,740 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Lab5_Kirchhoff_Migration</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-09-26"><meta name="DC.source" content="Lab5_Kirchhoff_Migration.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#4">Kirchhoff Time Migration</a></li></ul></div><pre class="codeinput"><span class="comment">%kirchhoff time migration and PSPI depth migration</span>
+clear
+close <span class="string">all</span>
+
+dt=0.002;
+tmax=2;
+t=0:dt:tmax;
+
+dtstep=.001; <span class="comment">% size of time step for modelling (in seconds)</span>
+dx=5; <span class="comment">% grid size</span>
+dz=5;
+velmodel=1
+
+
+<span class="keyword">if</span> (velmodel==1)
+    [vel,xvel,zvel]=thrustmodel(dx);
+<span class="keyword">elseif</span> (velmodel==2)
+    [vel,xvel,zvel]=channelmodel(dx);
+<span class="keyword">elseif</span> (velmodel==3)
+    [vel,xvel,zvel]=wedgemodel(dx);
+<span class="keyword">elseif</span> (velmodel==4)
+    [vel,xvel,zvel]=flatmodel(dx);
+<span class="keyword">elseif</span> (velmodel==5)
+    [vel,xvel,zvel]=synclinemodel(dx);
+<span class="keyword">end</span>
+
+figure;
+imagesc(xvel,zvel,vel);
+title(<span class="string">'Velocity Model'</span>);
+xlabel(<span class="string">'Distance (m)'</span>);
+ylabel(<span class="string">'Depth (m)'</span>);
+colorbar;
+colormap(<span class="string">'jet'</span>);
+prepfig;
+set(gcf,<span class="string">'position'</span>,[100 100 800 400]);
+</pre><pre class="codeoutput">
+velmodel =
+
+     1
+
+</pre><img vspace="5" hspace="5" src="Lab5_Kirchhoff_Migration_01.png" alt=""> <pre class="codeinput">xrec=0:dx:(size(vel,2)-1)*dx;
+z=0:dx:(size(vel,1)-1)*dx;
+zrec=zeros(size(xrec)); <span class="comment">% z-positions of receivers (in consisent units)</span>
+filt=[5 10 40 50];
+laplacian=2;
+boundary=2;
+phase=0;
+
+fdom=10;
+[w,tw]=wavemin(dt,fdom,tmax);
+
+[seismogram,seis,t]=afd_explode(dx,dtstep,dt,tmax,vel,xrec,zrec,w,tw,laplacian,boundary);
+
+figure;
+imagesc(xrec,t,seismogram);
+title(<span class="string">'ZOS in Time '</span>);
+xlabel(<span class="string">'Distance (m)'</span>);
+ylabel(<span class="string">'Time (s)'</span>);
+colormap(<span class="string">'gray'</span>);
+prepfig;
+set(gcf,<span class="string">'position'</span>,[100 100 800 400]);
+</pre><pre class="codeoutput">There are 2000 steps to complete
+wavefield propagated to 0.081 s; computation time left 28.3174 s
+wavefield propagated to 0.162 s; computation time left 25.5101 s
+wavefield propagated to 0.243 s; computation time left 23.6726 s
+wavefield propagated to 0.324 s; computation time left 22.2483 s
+wavefield propagated to 0.405 s; computation time left 20.9645 s
+wavefield propagated to 0.486 s; computation time left 19.8813 s
+wavefield propagated to 0.567 s; computation time left 18.787 s
+wavefield propagated to 0.648 s; computation time left 17.671 s
+wavefield propagated to 0.729 s; computation time left 16.5418 s
+wavefield propagated to 0.81 s; computation time left 15.5175 s
+wavefield propagated to 0.891 s; computation time left 14.4863 s
+wavefield propagated to 0.972 s; computation time left 13.4378 s
+wavefield propagated to 1.053 s; computation time left 12.3935 s
+wavefield propagated to 1.134 s; computation time left 11.3361 s
+wavefield propagated to 1.215 s; computation time left 10.2465 s
+wavefield propagated to 1.296 s; computation time left 9.1642 s
+wavefield propagated to 1.377 s; computation time left 8.0956 s
+wavefield propagated to 1.458 s; computation time left 7.0355 s
+wavefield propagated to 1.539 s; computation time left 5.9755 s
+wavefield propagated to 1.62 s; computation time left 4.9193 s
+wavefield propagated to 1.701 s; computation time left 3.866 s
+wavefield propagated to 1.782 s; computation time left 2.8178 s
+wavefield propagated to 1.863 s; computation time left 1.7704 s
+wavefield propagated to 1.944 s; computation time left 0.72398 s
+modelling completed
+resampling
+applying wavelet
+Elapsed time is 29.393736 seconds.
+</pre><img vspace="5" hspace="5" src="Lab5_Kirchhoff_Migration_02.png" alt=""> <pre class="codeinput"><span class="comment">%make an rms velocity model</span>
+<span class="comment">%load matlab (for testing without runnning the FD</span>
+[vrms,tv,vint]=vz2vrms(vel,z,t(2)-t(1),max(t));
+
+figure;
+imagesc(xrec,tv,vint);
+title(<span class="string">'Interval Velocity in Time '</span>);
+xlabel(<span class="string">'Distance (m)'</span>);
+ylabel(<span class="string">'Time (s)'</span>);
+colorbar;
+colormap(<span class="string">'jet'</span>);
+prepfig;
+set(gcf,<span class="string">'position'</span>,[100 100 800 400]);
+
+figure;
+imagesc(xrec,tv,vrms);
+title(<span class="string">'RMS Velocity in Time '</span>);
+xlabel(<span class="string">'Distance (m)'</span>);
+ylabel(<span class="string">'Time (s)'</span>);
+colorbar;
+colormap(<span class="string">'jet'</span>);
+prepfig;
+set(gcf,<span class="string">'position'</span>,[100 100 800 400]);
+</pre><pre class="codeoutput">Hang on, almost done!
+</pre><img vspace="5" hspace="5" src="Lab5_Kirchhoff_Migration_03.png" alt=""> <img vspace="5" hspace="5" src="Lab5_Kirchhoff_Migration_04.png" alt=""> <h2 id="4">Kirchhoff Time Migration</h2><pre class="codeinput">params=nan*ones(1,12);
+[seismig,tmig,xmig]=kirk_mig(seismogram,vrms,t,xrec,params);
+
+figure;
+imagesc(xmig,tmig,seismig);
+title(<span class="string">'Kirchhoff Time Migration Result in Time '</span>);
+xlabel(<span class="string">'Distance (m)'</span>);
+ylabel(<span class="string">'Time (s)'</span>);
+colormap(<span class="string">'gray'</span>);
+prepfig;
+set(gcf,<span class="string">'position'</span>,[100 100 800 400]);
+</pre><pre class="codeoutput"> 
+ --- Total number of traces to be migrated : 1021 ---
+ 
+ Migrated trace no.20 of 1021, The input traces in aperture : 581
+Estimated time remaining 89 seconds
+ Migrated trace no.40 of 1021, The input traces in aperture : 601
+Estimated time remaining 100 seconds
+ Migrated trace no.60 of 1021, The input traces in aperture : 621
+Estimated time remaining 97 seconds
+ Migrated trace no.80 of 1021, The input traces in aperture : 641
+Estimated time remaining 94 seconds
+ Migrated trace no.100 of 1021, The input traces in aperture : 661
+Estimated time remaining 94 seconds
+ Migrated trace no.120 of 1021, The input traces in aperture : 681
+Estimated time remaining 92 seconds
+ Migrated trace no.140 of 1021, The input traces in aperture : 701
+Estimated time remaining 92 seconds
+ Migrated trace no.160 of 1021, The input traces in aperture : 721
+Estimated time remaining 90 seconds
+ Migrated trace no.180 of 1021, The input traces in aperture : 741
+Estimated time remaining 89 seconds
+ Migrated trace no.200 of 1021, The input traces in aperture : 761
+Estimated time remaining 88 seconds
+ Migrated trace no.220 of 1021, The input traces in aperture : 781
+Estimated time remaining 86 seconds
+ Migrated trace no.240 of 1021, The input traces in aperture : 801
+Estimated time remaining 85 seconds
+ Migrated trace no.260 of 1021, The input traces in aperture : 821
+Estimated time remaining 84 seconds
+ Migrated trace no.280 of 1021, The input traces in aperture : 841
+Estimated time remaining 83 seconds
+ Migrated trace no.300 of 1021, The input traces in aperture : 861
+Estimated time remaining 82 seconds
+ Migrated trace no.320 of 1021, The input traces in aperture : 881
+Estimated time remaining 83 seconds
+ Migrated trace no.340 of 1021, The input traces in aperture : 901
+Estimated time remaining 82 seconds
+ Migrated trace no.360 of 1021, The input traces in aperture : 921
+Estimated time remaining 81 seconds
+ Migrated trace no.380 of 1021, The input traces in aperture : 941
+Estimated time remaining 79 seconds
+ Migrated trace no.400 of 1021, The input traces in aperture : 961
+Estimated time remaining 78 seconds
+ Migrated trace no.420 of 1021, The input traces in aperture : 981
+Estimated time remaining 77 seconds
+ Migrated trace no.440 of 1021, The input traces in aperture : 1001
+Estimated time remaining 75 seconds
+ Migrated trace no.460 of 1021, The input traces in aperture : 1021
+Estimated time remaining 73 seconds
+ Migrated trace no.480 of 1021, The input traces in aperture : 1021
+Estimated time remaining 71 seconds
+ Migrated trace no.500 of 1021, The input traces in aperture : 1021
+Estimated time remaining 69 seconds
+ Migrated trace no.520 of 1021, The input traces in aperture : 1021
+Estimated time remaining 67 seconds
+ Migrated trace no.540 of 1021, The input traces in aperture : 1021
+Estimated time remaining 65 seconds
+ Migrated trace no.560 of 1021, The input traces in aperture : 1021
+Estimated time remaining 63 seconds
+ Migrated trace no.580 of 1021, The input traces in aperture : 1003
+Estimated time remaining 61 seconds
+ Migrated trace no.600 of 1021, The input traces in aperture : 983
+Estimated time remaining 58 seconds
+ Migrated trace no.620 of 1021, The input traces in aperture : 963
+Estimated time remaining 56 seconds
+ Migrated trace no.640 of 1021, The input traces in aperture : 943
+Estimated time remaining 53 seconds
+ Migrated trace no.660 of 1021, The input traces in aperture : 923
+Estimated time remaining 50 seconds
+ Migrated trace no.680 of 1021, The input traces in aperture : 903
+Estimated time remaining 48 seconds
+ Migrated trace no.700 of 1021, The input traces in aperture : 883
+Estimated time remaining 45 seconds
+ Migrated trace no.720 of 1021, The input traces in aperture : 863
+Estimated time remaining 42 seconds
+ Migrated trace no.740 of 1021, The input traces in aperture : 843
+Estimated time remaining 39 seconds
+ Migrated trace no.760 of 1021, The input traces in aperture : 823
+Estimated time remaining 36 seconds
+ Migrated trace no.780 of 1021, The input traces in aperture : 803
+Estimated time remaining 34 seconds
+ Migrated trace no.800 of 1021, The input traces in aperture : 783
+Estimated time remaining 31 seconds
+ Migrated trace no.820 of 1021, The input traces in aperture : 763
+Estimated time remaining 28 seconds
+ Migrated trace no.840 of 1021, The input traces in aperture : 743
+Estimated time remaining 25 seconds
+ Migrated trace no.860 of 1021, The input traces in aperture : 723
+Estimated time remaining 22 seconds
+ Migrated trace no.880 of 1021, The input traces in aperture : 703
+Estimated time remaining 20 seconds
+ Migrated trace no.900 of 1021, The input traces in aperture : 683
+Estimated time remaining 17 seconds
+ Migrated trace no.920 of 1021, The input traces in aperture : 663
+Estimated time remaining 14 seconds
+ Migrated trace no.940 of 1021, The input traces in aperture : 643
+Estimated time remaining 11 seconds
+ Migrated trace no.960 of 1021, The input traces in aperture : 623
+Estimated time remaining 8 seconds
+ Migrated trace no.980 of 1021, The input traces in aperture : 603
+Estimated time remaining 6 seconds
+ Migrated trace no.1000 of 1021, The input traces in aperture : 583
+Estimated time remaining 3 seconds
+ Migrated trace no.1020 of 1021, The input traces in aperture : 563
+Estimated time remaining 0 seconds
+migration completed in 137 seconds
+</pre><img vspace="5" hspace="5" src="Lab5_Kirchhoff_Migration_05.png" alt=""> <pre class="codeinput">[seismigz,z1]=stretch(seismig,tmig,vel,z,dx,1);
+n=find(z1==2500);
+figure;
+imagesc(xmig,z1(1:n),seismigz(1:n,:));
+title(<span class="string">'Kirchhoff Time Migration Result in Depth '</span>);
+xlabel(<span class="string">'Distance (m)'</span>);
+ylabel(<span class="string">'Depth (m)'</span>);
+colormap(<span class="string">'gray'</span>);
+prepfig;
+set(gcf,<span class="string">'position'</span>,[100 100 800 400]);
+</pre><pre class="codeoutput">Finished trace 20 of 1021
+Finished trace 40 of 1021
+Finished trace 60 of 1021
+Finished trace 80 of 1021
+Finished trace 100 of 1021
+Finished trace 120 of 1021
+Finished trace 140 of 1021
+Finished trace 160 of 1021
+Finished trace 180 of 1021
+Finished trace 200 of 1021
+Finished trace 220 of 1021
+Finished trace 240 of 1021
+Finished trace 260 of 1021
+Finished trace 280 of 1021
+Finished trace 300 of 1021
+Finished trace 320 of 1021
+Finished trace 340 of 1021
+Finished trace 360 of 1021
+Finished trace 380 of 1021
+Finished trace 400 of 1021
+Finished trace 420 of 1021
+Finished trace 440 of 1021
+Finished trace 460 of 1021
+Finished trace 480 of 1021
+Finished trace 500 of 1021
+Finished trace 520 of 1021
+Finished trace 540 of 1021
+Finished trace 560 of 1021
+Finished trace 580 of 1021
+Finished trace 600 of 1021
+Finished trace 620 of 1021
+Finished trace 640 of 1021
+Finished trace 660 of 1021
+Finished trace 680 of 1021
+Finished trace 700 of 1021
+Finished trace 720 of 1021
+Finished trace 740 of 1021
+Finished trace 760 of 1021
+Finished trace 780 of 1021
+Finished trace 800 of 1021
+Finished trace 820 of 1021
+Finished trace 840 of 1021
+Finished trace 860 of 1021
+Finished trace 880 of 1021
+Finished trace 900 of 1021
+Finished trace 920 of 1021
+Finished trace 940 of 1021
+Finished trace 960 of 1021
+Finished trace 980 of 1021
+Finished trace 1000 of 1021
+Finished trace 1020 of 1021
+</pre><img vspace="5" hspace="5" src="Lab5_Kirchhoff_Migration_06.png" alt=""> <pre class="codeinput">[seismig_z]=kirk_migz(seismogram,vint,dt,dx,dz,params);
+frange=[0 100];
+zcheck=100:200:2500;
+
+figure;
+imagesc(xrec,z,seismig_z);
+title(<span class="string">'Kirchhoff Depth Migration Result'</span>);
+xlabel(<span class="string">'Distance (m)'</span>);
+ylabel(<span class="string">'Depth (m)'</span>);
+colormap(<span class="string">'gray'</span>);
+prepfig;
+set(gcf,<span class="string">'position'</span>,[100 100 800 400]);
+</pre><pre class="codeoutput"> 
+ --- Total number of traces to be migrated : 1021 ---
+ 
+ Migrated trace no.20 of 1021, The traces in aperture : 581
+Estimated time remaining 127 seconds
+ Migrated trace no.40 of 1021, The traces in aperture : 601
+Estimated time remaining 126 seconds
+ Migrated trace no.60 of 1021, The traces in aperture : 621
+Estimated time remaining 112 seconds
+ Migrated trace no.80 of 1021, The traces in aperture : 641
+Estimated time remaining 106 seconds
+ Migrated trace no.100 of 1021, The traces in aperture : 661
+Estimated time remaining 101 seconds
+ Migrated trace no.120 of 1021, The traces in aperture : 681
+Estimated time remaining 98 seconds
+ Migrated trace no.140 of 1021, The traces in aperture : 701
+Estimated time remaining 96 seconds
+ Migrated trace no.160 of 1021, The traces in aperture : 721
+Estimated time remaining 94 seconds
+ Migrated trace no.180 of 1021, The traces in aperture : 741
+Estimated time remaining 92 seconds
+ Migrated trace no.200 of 1021, The traces in aperture : 761
+Estimated time remaining 90 seconds
+ Migrated trace no.220 of 1021, The traces in aperture : 781
+Estimated time remaining 89 seconds
+ Migrated trace no.240 of 1021, The traces in aperture : 801
+Estimated time remaining 87 seconds
+ Migrated trace no.260 of 1021, The traces in aperture : 821
+Estimated time remaining 86 seconds
+ Migrated trace no.280 of 1021, The traces in aperture : 841
+Estimated time remaining 84 seconds
+ Migrated trace no.300 of 1021, The traces in aperture : 861
+Estimated time remaining 83 seconds
+ Migrated trace no.320 of 1021, The traces in aperture : 881
+Estimated time remaining 81 seconds
+ Migrated trace no.340 of 1021, The traces in aperture : 901
+Estimated time remaining 80 seconds
+ Migrated trace no.360 of 1021, The traces in aperture : 921
+Estimated time remaining 78 seconds
+ Migrated trace no.380 of 1021, The traces in aperture : 941
+Estimated time remaining 77 seconds
+ Migrated trace no.400 of 1021, The traces in aperture : 961
+Estimated time remaining 75 seconds
+ Migrated trace no.420 of 1021, The traces in aperture : 981
+Estimated time remaining 74 seconds
+ Migrated trace no.440 of 1021, The traces in aperture : 1001
+Estimated time remaining 72 seconds
+ Migrated trace no.460 of 1021, The traces in aperture : 1021
+Estimated time remaining 70 seconds
+ Migrated trace no.480 of 1021, The traces in aperture : 1021
+Estimated time remaining 69 seconds
+ Migrated trace no.500 of 1021, The traces in aperture : 1021
+Estimated time remaining 67 seconds
+ Migrated trace no.520 of 1021, The traces in aperture : 1021
+Estimated time remaining 65 seconds
+ Migrated trace no.540 of 1021, The traces in aperture : 1021
+Estimated time remaining 63 seconds
+ Migrated trace no.560 of 1021, The traces in aperture : 1021
+Estimated time remaining 61 seconds
+ Migrated trace no.580 of 1021, The traces in aperture : 1003
+Estimated time remaining 58 seconds
+ Migrated trace no.600 of 1021, The traces in aperture : 983
+Estimated time remaining 56 seconds
+ Migrated trace no.620 of 1021, The traces in aperture : 963
+Estimated time remaining 54 seconds
+ Migrated trace no.640 of 1021, The traces in aperture : 943
+Estimated time remaining 51 seconds
+ Migrated trace no.660 of 1021, The traces in aperture : 923
+Estimated time remaining 49 seconds
+ Migrated trace no.680 of 1021, The traces in aperture : 903
+Estimated time remaining 47 seconds
+ Migrated trace no.700 of 1021, The traces in aperture : 883
+Estimated time remaining 44 seconds
+ Migrated trace no.720 of 1021, The traces in aperture : 863
+Estimated time remaining 41 seconds
+ Migrated trace no.740 of 1021, The traces in aperture : 843
+Estimated time remaining 39 seconds
+ Migrated trace no.760 of 1021, The traces in aperture : 823
+Estimated time remaining 36 seconds
+ Migrated trace no.780 of 1021, The traces in aperture : 803
+Estimated time remaining 33 seconds
+ Migrated trace no.800 of 1021, The traces in aperture : 783
+Estimated time remaining 30 seconds
+ Migrated trace no.820 of 1021, The traces in aperture : 763
+Estimated time remaining 27 seconds
+ Migrated trace no.840 of 1021, The traces in aperture : 743
+Estimated time remaining 25 seconds
+ Migrated trace no.860 of 1021, The traces in aperture : 723
+Estimated time remaining 22 seconds
+ Migrated trace no.880 of 1021, The traces in aperture : 703
+Estimated time remaining 19 seconds
+ Migrated trace no.900 of 1021, The traces in aperture : 683
+Estimated time remaining 16 seconds
+ Migrated trace no.920 of 1021, The traces in aperture : 663
+Estimated time remaining 14 seconds
+ Migrated trace no.940 of 1021, The traces in aperture : 643
+Estimated time remaining 11 seconds
+ Migrated trace no.960 of 1021, The traces in aperture : 623
+Estimated time remaining 8 seconds
+ Migrated trace no.980 of 1021, The traces in aperture : 603
+Estimated time remaining 5 seconds
+ Migrated trace no.1000 of 1021, The traces in aperture : 583
+Estimated time remaining 3 seconds
+ Migrated trace no.1020 of 1021, The traces in aperture : 563
+Estimated time remaining 0 seconds
+migration completed in 133 seconds
+</pre><img vspace="5" hspace="5" src="Lab5_Kirchhoff_Migration_07.png" alt=""> <pre class="codeinput"><span class="comment">%pspi depth migration</span>
+pspimig=pspi_stack(seismogram,t,xrec,vel,xvel,zvel,[0 80]);
+imagesc(xvel,zvel,pspimig);
+title(<span class="string">'PSPI depth migration (using pspi_stack)'</span>)
+</pre><pre class="codeoutput"> pspi_stack working on depth 5 of 501
+ pspi_stack working on depth 10 of 501
+ pspi_stack working on depth 15 of 501
+ pspi_stack working on depth 20 of 501
+ pspi_stack working on depth 25 of 501
+ pspi_stack working on depth 30 of 501 time left ~ 18(s)
+ elapsed time 1 (s), estimated time remaining 18 (s)
+ pspi_stack working on depth 35 of 501
+ pspi_stack working on depth 40 of 501
+ pspi_stack working on depth 45 of 501
+ pspi_stack working on depth 50 of 501
+ pspi_stack working on depth 55 of 501
+ pspi_stack working on depth 60 of 501 time left ~ 17(s)
+ elapsed time 2 (s), estimated time remaining 17 (s)
+ pspi_stack working on depth 65 of 501
+ pspi_stack working on depth 70 of 501
+ pspi_stack working on depth 75 of 501
+ pspi_stack working on depth 80 of 501
+ pspi_stack working on depth 85 of 501
+ pspi_stack working on depth 90 of 501 time left ~ 15(s)
+ elapsed time 3 (s), estimated time remaining 15 (s)
+ pspi_stack working on depth 95 of 501
+ pspi_stack working on depth 100 of 501
+ pspi_stack working on depth 105 of 501
+ pspi_stack working on depth 110 of 501
+ pspi_stack working on depth 115 of 501
+ pspi_stack working on depth 120 of 501 time left ~ 14(s)
+ elapsed time 4 (s), estimated time remaining 14 (s)
+ pspi_stack working on depth 125 of 501
+ pspi_stack working on depth 130 of 501
+ pspi_stack working on depth 135 of 501
+ pspi_stack working on depth 140 of 501
+ pspi_stack working on depth 145 of 501
+ pspi_stack working on depth 150 of 501 time left ~ 13(s)
+ elapsed time 5 (s), estimated time remaining 13 (s)
+ pspi_stack working on depth 155 of 501
+ pspi_stack working on depth 160 of 501
+ pspi_stack working on depth 165 of 501
+ pspi_stack working on depth 170 of 501
+ pspi_stack working on depth 175 of 501
+ pspi_stack working on depth 180 of 501 time left ~ 12(s)
+ elapsed time 7 (s), estimated time remaining 12 (s)
+ pspi_stack working on depth 185 of 501
+ pspi_stack working on depth 190 of 501
+ pspi_stack working on depth 195 of 501
+ pspi_stack working on depth 200 of 501
+ pspi_stack working on depth 205 of 501
+ pspi_stack working on depth 210 of 501 time left ~ 11(s)
+ elapsed time 8 (s), estimated time remaining 11 (s)
+ pspi_stack working on depth 215 of 501
+ pspi_stack working on depth 220 of 501
+ pspi_stack working on depth 225 of 501
+ pspi_stack working on depth 230 of 501
+ pspi_stack working on depth 235 of 501
+ pspi_stack working on depth 240 of 501 time left ~ 9(s)
+ elapsed time 9 (s), estimated time remaining 9 (s)
+ pspi_stack working on depth 245 of 501
+ pspi_stack working on depth 250 of 501
+ pspi_stack working on depth 255 of 501
+ pspi_stack working on depth 260 of 501
+ pspi_stack working on depth 265 of 501
+ pspi_stack working on depth 270 of 501 time left ~ 8(s)
+ elapsed time 10 (s), estimated time remaining 8 (s)
+ pspi_stack working on depth 275 of 501
+ pspi_stack working on depth 280 of 501
+ pspi_stack working on depth 285 of 501
+ pspi_stack working on depth 290 of 501
+ pspi_stack working on depth 295 of 501
+ pspi_stack working on depth 300 of 501 time left ~ 7(s)
+ elapsed time 11 (s), estimated time remaining 7 (s)
+ pspi_stack working on depth 305 of 501
+ pspi_stack working on depth 310 of 501
+ pspi_stack working on depth 315 of 501
+ pspi_stack working on depth 320 of 501
+ pspi_stack working on depth 325 of 501
+ pspi_stack working on depth 330 of 501 time left ~ 6(s)
+ elapsed time 12 (s), estimated time remaining 6 (s)
+ pspi_stack working on depth 335 of 501
+ pspi_stack working on depth 340 of 501
+ pspi_stack working on depth 345 of 501
+ pspi_stack working on depth 350 of 501
+ pspi_stack working on depth 355 of 501
+ pspi_stack working on depth 360 of 501 time left ~ 5(s)
+ elapsed time 13 (s), estimated time remaining 5 (s)
+ pspi_stack working on depth 365 of 501
+ pspi_stack working on depth 370 of 501
+ pspi_stack working on depth 375 of 501
+ pspi_stack working on depth 380 of 501
+ pspi_stack working on depth 385 of 501
+ pspi_stack working on depth 390 of 501 time left ~ 4(s)
+ elapsed time 14 (s), estimated time remaining 4 (s)
+ pspi_stack working on depth 395 of 501
+ pspi_stack working on depth 400 of 501
+ pspi_stack working on depth 405 of 501
+ pspi_stack working on depth 410 of 501
+ pspi_stack working on depth 415 of 501
+ pspi_stack working on depth 420 of 501 time left ~ 3(s)
+ elapsed time 15 (s), estimated time remaining 3 (s)
+ pspi_stack working on depth 425 of 501
+ pspi_stack working on depth 430 of 501
+ pspi_stack working on depth 435 of 501
+ pspi_stack working on depth 440 of 501
+ pspi_stack working on depth 445 of 501
+ pspi_stack working on depth 450 of 501 time left ~ 2(s)
+ elapsed time 16 (s), estimated time remaining 2 (s)
+ pspi_stack working on depth 455 of 501
+ pspi_stack working on depth 460 of 501
+ pspi_stack working on depth 465 of 501
+ pspi_stack working on depth 470 of 501
+ pspi_stack working on depth 475 of 501
+ pspi_stack working on depth 480 of 501 time left ~ 1(s)
+ elapsed time 17 (s), estimated time remaining 1 (s)
+ pspi_stack working on depth 485 of 501
+ pspi_stack working on depth 490 of 501
+ pspi_stack working on depth 495 of 501
+ pspi_stack working on depth 500 of 501
+zos migrated in 17(s)
+</pre><img vspace="5" hspace="5" src="Lab5_Kirchhoff_Migration_08.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%kirchhoff time migration and PSPI depth migration
+clear
+close all
+
+dt=0.002;
+tmax=2;
+t=0:dt:tmax;
+
+dtstep=.001; % size of time step for modelling (in seconds)
+dx=5; % grid size
+dz=5;
+velmodel=1
+
+
+if (velmodel==1)
+    [vel,xvel,zvel]=thrustmodel(dx);
+elseif (velmodel==2)
+    [vel,xvel,zvel]=channelmodel(dx);
+elseif (velmodel==3)
+    [vel,xvel,zvel]=wedgemodel(dx);
+elseif (velmodel==4)
+    [vel,xvel,zvel]=flatmodel(dx);
+elseif (velmodel==5)
+    [vel,xvel,zvel]=synclinemodel(dx);      
+end
+
+figure;
+imagesc(xvel,zvel,vel);
+title('Velocity Model');
+xlabel('Distance (m)');
+ylabel('Depth (m)');
+colorbar;
+colormap('jet');
+prepfig;
+set(gcf,'position',[100 100 800 400]);
+
+%%   
+xrec=0:dx:(size(vel,2)-1)*dx;
+z=0:dx:(size(vel,1)-1)*dx;
+zrec=zeros(size(xrec)); % z-positions of receivers (in consisent units)
+filt=[5 10 40 50];
+laplacian=2;
+boundary=2;
+phase=0;
+
+fdom=10;
+[w,tw]=wavemin(dt,fdom,tmax);
+
+[seismogram,seis,t]=afd_explode(dx,dtstep,dt,tmax,vel,xrec,zrec,w,tw,laplacian,boundary);
+
+figure;
+imagesc(xrec,t,seismogram);
+title('ZOS in Time ');
+xlabel('Distance (m)');
+ylabel('Time (s)');
+colormap('gray');
+prepfig;
+set(gcf,'position',[100 100 800 400]);
+
+
+
+
+%%
+%make an rms velocity model
+%load matlab (for testing without runnning the FD
+[vrms,tv,vint]=vz2vrms(vel,z,t(2)-t(1),max(t));
+
+figure;
+imagesc(xrec,tv,vint);
+title('Interval Velocity in Time ');
+xlabel('Distance (m)');
+ylabel('Time (s)');
+colorbar;
+colormap('jet');
+prepfig;
+set(gcf,'position',[100 100 800 400]);
+
+figure;
+imagesc(xrec,tv,vrms);
+title('RMS Velocity in Time ');
+xlabel('Distance (m)');
+ylabel('Time (s)');
+colorbar;
+colormap('jet');
+prepfig;
+set(gcf,'position',[100 100 800 400]);
+
+
+%% Kirchhoff Time Migration 
+params=nan*ones(1,12);
+[seismig,tmig,xmig]=kirk_mig(seismogram,vrms,t,xrec,params);
+
+figure;
+imagesc(xmig,tmig,seismig);
+title('Kirchhoff Time Migration Result in Time ');
+xlabel('Distance (m)');
+ylabel('Time (s)');
+colormap('gray');
+prepfig;
+set(gcf,'position',[100 100 800 400]);
+
+%%
+
+[seismigz,z1]=stretch(seismig,tmig,vel,z,dx,1);
+n=find(z1==2500);
+figure;
+imagesc(xmig,z1(1:n),seismigz(1:n,:));
+title('Kirchhoff Time Migration Result in Depth ');
+xlabel('Distance (m)');
+ylabel('Depth (m)');
+colormap('gray');
+prepfig;
+set(gcf,'position',[100 100 800 400]);
+
+
+%%
+[seismig_z]=kirk_migz(seismogram,vint,dt,dx,dz,params);
+frange=[0 100];
+zcheck=100:200:2500;
+
+figure;
+imagesc(xrec,z,seismig_z);
+title('Kirchhoff Depth Migration Result');
+xlabel('Distance (m)');
+ylabel('Depth (m)');
+colormap('gray');
+prepfig;
+set(gcf,'position',[100 100 800 400]);
+
+%%
+%pspi depth migration
+pspimig=pspi_stack(seismogram,t,xrec,vel,xvel,zvel,[0 80]);
+imagesc(xvel,zvel,pspimig);
+title('PSPI depth migration (using pspi_stack)')
+
+
+##### SOURCE END #####
+--></body></html>
