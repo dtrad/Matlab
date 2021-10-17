@@ -107,7 +107,7 @@ if (doplot>1)
     if(doplot >2) print -dpng mwni_res.png;end
 
 end
-keyboard;
+%keyboard;
 return
 
 
@@ -206,7 +206,7 @@ for iter=1:niter
     ss(nh+1:nh+nk)=eps*S(1:nk);
     den=ss'*ss;
     %denp(iter)=den;plot(denp);figure(gcf);pause
-    %if (abs(den)<1e-7) keyboard;end
+    if (abs(den)<1e-7) keyboard;end
     alpha=gammam/den;
     X=X+alpha*S;
     rr=rr-alpha*ss;
