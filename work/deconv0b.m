@@ -96,7 +96,7 @@ myprepfig
 % Regularization parameters
 % Use the L-curve criterion and GCV to determine the regularization
 % parameters for Tikhonov regularization and truncated SVD.
-return;
+%return;
 figure
 subplot(221);k_l1 = l_curve(U,s,b,'tsvd'); title('(a)'); %axis([1e-3,1,1,1e3]),      pause
 subplot(222);k_gcv1 = gcv(U,s,b,'tsvd'); title('(b)');   %axis([0,20,1e-9,1e-1]),    pause
@@ -208,7 +208,13 @@ mytext=sprintf('(b) Final solution with GSVD and %d eigenvectors\n',k_tgsvd);
 title(mytext);
 
 
+figure
+subplot(411);plot(t,d,t,ww);title('(a) data+noise and wavelet');xlabel(xlab);ylabel(ylab)
+subplot(412);plot(t,x,'+',t,x_tsvd_gcv1);title('(b) Deconvolved with TSVD in original space all vectors (wo/noise)');xlabel(xlab);ylabel(ylab)
+subplot(413);plot(t,x,'+',t,x_tsvd_gcv2);title('(c) Deconvolved with TSVD in original space and 23 vectors (w/noise)');xlabel(xlab);ylabel(ylab)
+subplot(414);plot(t,x,'+',t,xsol);title('(d) Deconvolved with TSVD in a manifold 6 vectors (w/noise)');xlabel(xlab);ylabel(ylab)
 
+myprepfig
 
 
 

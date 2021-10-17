@@ -2,7 +2,8 @@
 % preconditioner. Influence on outliers, prior information, and
 % null space.
 % Daniel Trad - UBC March-15 2000
-
+close all;
+clear
 iter_end=7;
 PI_t=1e-6;
 DI_t=1e-6;
@@ -23,15 +24,18 @@ W=diag([1 1 1 1 1 1]); % Model preconditioner
 
 x=karmarkar(b,A,iter_end,PI_t,DI_t,DG_t,gamma,delta);
 
+display("Karmarkar's method");
 [x m]
 
 
-return;
+
 
 [x,rho,eta,nit] = wtcgls(A,diag([1 1 1 1 1 100000]),b,6,0,0.9)
 
+[x m]
+return;
 
-
+display("Normal Equations");
 [u,s,v]=svd(A'*A);
 u0=u(:,6); % Null space
 tol=1e-10;
