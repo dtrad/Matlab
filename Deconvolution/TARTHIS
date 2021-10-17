@@ -1,0 +1,2 @@
+tar -cvzf ~/tar/deconexamplematlab.tar.gz * --exclude=*.o --exclude=*~  
+scp ~/tar/deconexamplematlab.tar.gz wynter:~/tar/.
