@@ -3,9 +3,9 @@
 % Daniel Trad - UBC - EOS - 15-7-99
 clear
 %close all
-curve='HRT';
+curve='PRT';
 savesu='y'
-pathfile='/home/dtrad/work/';
+pathfile='/home/dtrad/Matlab/work/';
 file='model5';
 filename=[pathfile file];
 

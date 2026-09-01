@@ -21,7 +21,7 @@ d=d+noise;
 figure,wigb(d,1,h,t);
 
 %dr=radonop(v,t,h,p);
-[vr,dr]=radon0(d,h,np,vmin,vmax,dt,method,[],eps1,eps2,.9);
+[vr,dr]=radon0(d,h,np,vmin,vmax,dt,method,[],eps2,.9);
 figure,wigb(vr,1,p,t);  
   
 for i=1:iterend;
