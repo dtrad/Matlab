@@ -15,7 +15,7 @@ step=.9;
 
 [nt np]=size(v);
 [nt nh]=size(d);
-noise=0.5*perc/100*(rand(size(d))-0.5);
+noise=0.005*perc/100*(rand(size(d))-0.5);
 
 d=d+noise;
 figure,wigb(d,1,h,t);
@@ -25,8 +25,8 @@ figure,wigb(d,1,h,t);
 figure,wigb(vr,1,p,t);  
   
 for i=1:iterend;
-[vr,dr]=radon0(d,h,np,vmin,vmax,dt,method,vr,eps1,eps2,.9);
-figure,wigb(vr,1,p,t);  
+[vr,dr]=radon0(d,h,np,vmin,vmax,dt,method,vr,eps2,.9);
 end
+figure,wigb(vr,1,p,t);  
 
 

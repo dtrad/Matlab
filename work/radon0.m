@@ -168,9 +168,9 @@ DD=duplic(DR);
 v=ifft(VD);
 dr=ifft(DD);
 t=0:nt-1;t=t*dt;
-figure,wigb(d,1,h,t);
-figure,wigb(dr,1,h,t );   
-figure,wigb(v,1,p,t);
+%figure,wigb(d,1,h,t);
+%figure,wigb(dr,1,h,t );   
+%figure,wigb(v,1,p,t);
 
 clear global stpc reorth eps2 step;
 

@@ -5,7 +5,7 @@ clear
 %close all
 curve='PRT';
 savesu='y'
-pathfile='/home/dtrad/Matlab/work/';
+pathfile=pwd;
 file='model5';
 filename=[pathfile file];
 

@@ -21,7 +21,10 @@ elseif (curve=='LRT')
    pmax=1/(vmin);
    dq=(pmax-pmin)/(np-1);
    p=pmin:dq:pmax;   
+else 
+    p = [];
+    dq=0;
 end
 
-
+return
 

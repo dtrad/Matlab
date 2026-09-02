@@ -45,15 +45,16 @@ set(gca,'NextPlot','add','Box','on', ...
   'XLim', [x1 x2], ...
   'YDir','reverse', ...
   'YLim',[z1 z2]);
- 
 
-	fillcolor = [0 0 0];
-	linecolor = [0 0 0];
-	linewidth = 0.1;
+hold on; % use hold instead of EraseMode
 
-	z=z'; 	% input as row vector
-	zstart=z(1);
-	zend  =z(nz);
+fillcolor = [0 0 0];
+linecolor = [0 0 0];
+linewidth = 0.1;
+
+z=z'; 	% input as row vector
+zstart=z(1);
+zend  =z(nz);
 
 for i=1:nx,
    
@@ -90,24 +91,23 @@ for i=1:nx,
 
 	patch( aa+x(i) , zzz,  fillcolor);
 	
-	line( 'Color',[1 1 1],  ...
+	% draw zero line using axes background color (no EraseMode)
+	bgcolor = get(gca,'Color');
+	line( 'Color', bgcolor, ...
          'Xdata', x(i)+[0 0], 'Ydata',[zstart zend]); % remove zero line
 
-%'LineWidth',linewidth, ...
-%12/7/97 'Xdata', x(i)+[0 0], 'Ydata',[z0 z1]*dz);	% remove zero line
-
-	line( 'Color',linecolor,  ...
+	% draw trace line (negatives)
+	line( 'Color',linecolor, ...
 	 'LineWidth',linewidth, ...
 	 'Xdata', tr+x(i), 'Ydata',z);	% negatives line
 
    else % zeros trace
-	line( 'Color',linecolor,  ...
+	line( 'Color',linecolor, ...
 	 'LineWidth',linewidth, ...
          'Xdata', [x(i) x(i)], 'Ydata',[zstart zend]);
    end;
 end;
-
-
+end
 
 
 
