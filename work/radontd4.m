@@ -18,7 +18,7 @@ noise=randn(size(d));
 [nt np]=size(v);
 [nt nh]=size(d);
 WW=ones(size(nt*np,1));
-dr=radonopd(v,t,h,p,40);
+dr=radonopd(v,t,h,p);
 dr=dr+perc/100*noise;
 figure,wigb(dr,1,h,t);
 if (method==1) 
@@ -28,7 +28,7 @@ elseif (method==2)
    WW=1.1-ss(:);
 end  
 
-[vr]=wtcglstdd(t,h,p,WW,dr(:),2,0,step,theta);
+[vr]=wtcglstdd(t,h,p,WW,dr(:),2,0,step);
 figure,wigb(reshape(vr,nt,np));  
 
   
@@ -38,11 +38,11 @@ for i=1:iterend;
    end      
 	[vr]=wtcglstdd(t,h,p,WW,dr(:),inneriter,0,step,theta);  
    figure,wigb(reshape(vr,nt,np));
-   drr=radonopd(vr,t,h,p,theta);
+   drr=radonopd(vr,t,h,p);
    if (method==2) ss=semblance(drr,t,h,p);end
 end
 if (plotfig==1)
- drr=radonopd(vr,t,h,p,theta);
+ drr=radonopd(vr,t,h,p);
  figure,
  subplot(221);wigb(reshape(v,nt,np),1,p,t);
  subplot(223);wigb(reshape(vr,nt,np),1,p,t);

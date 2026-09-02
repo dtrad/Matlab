@@ -35,8 +35,8 @@ n=nt*np;
 
 n1=max(size(L)); 
 x = zeros(n,1);
-r  = b - radonopd(x(:),tt,hh,pp,theta); 
-s = radonopid(r(:),tt,hh,pp,theta);  
+r  = b - radonopd(x(:),tt,hh,pp); 
+s = radonopid(r(:),tt,hh,pp);  
 q1 = s./L;
 q  = q1./L;
 z  = q;
@@ -48,11 +48,11 @@ nit = k;
 % Iterate.
 for j=1:k
   
-  Az  = radonopd(z(:),tt,hh,pp,theta); 
+  Az  = radonopd(z(:),tt,hh,pp); 
   alpha = dq/(Az'*Az);
   x   = x + step*alpha*z;
   r   = r - step*alpha*Az; 
-  s = radonopid(r(:),tt,hh,pp,theta);
+  s = radonopid(r(:),tt,hh,pp);
   q1  = s./L;
   q   = q1./L;
   dq2 = s'*q;
